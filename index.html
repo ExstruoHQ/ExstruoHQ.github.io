@@ -1,0 +1,398 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Exstruo</title>
+<meta name="description" content="Exstruo는 Windows를 위한 작고 정교한 앱, Lapse와 Pulse를 만듭니다.">
+<link rel="icon" href="assets/mark.svg" type="image/svg+xml">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+<style>
+/* Apple 제품 페이지 문법: 얇고 반투명한 상단 막대, 가운데 정렬된 큰 제목, 밝은 회색과 검정이 번갈아 나오는 넓은 구획,
+   파란 캡슐 버튼과 '›' 글 링크, 넉넉한 여백, 스크롤하면 부드럽게 떠오르는 내용, 회색 작은 글씨의 바닥글. */
+:root {
+  --ink: #1d1d1f;
+  --ink-2: #6e6e73;
+  --ink-3: #86868b;
+  --paper: #ffffff;
+  --gray: #f5f5f7;
+  --line: #d2d2d7;
+  --blue: #0071e3;
+  --link: #0066cc;
+  --link-dark: #2997ff;
+  --font: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Pretendard Variable", Pretendard, "Segoe UI Variable Display", "Segoe UI", "Malgun Gothic", sans-serif;
+  --ease: cubic-bezier(.25, .1, .25, 1);
+  color-scheme: light;
+}
+* { box-sizing: border-box; }
+html { background: var(--paper); scroll-behavior: smooth; }
+body { margin: 0; background: var(--paper); color: var(--ink); font-family: var(--font); font-size: 17px; line-height: 1.47; letter-spacing: -0.022em; -webkit-font-smoothing: antialiased; overflow-x: hidden; }
+html[lang="ko"] body { word-break: keep-all; }
+h1, h2, h3, p { margin: 0; }
+a { color: inherit; text-decoration: none; }
+img { display: block; max-width: 100%; }
+:focus-visible { outline: 2px solid var(--blue); outline-offset: 3px; border-radius: 4px; }
+.wrap { width: min(980px, 100% - 2 * max(22px, env(safe-area-inset-left, 0px))); margin: 0 auto; }
+
+/* ---------- 상단 막대 */
+.gnav { position: sticky; top: 0; z-index: 50; height: 44px; background: rgba(250, 250, 252, .8); backdrop-filter: saturate(180%) blur(20px); -webkit-backdrop-filter: saturate(180%) blur(20px); border-bottom: 1px solid rgba(0, 0, 0, .06); }
+.gnav .wrap { height: 100%; display: flex; align-items: center; gap: 30px; font-size: 12px; letter-spacing: -0.01em; }
+.gnav .logo { display: flex; align-items: center; gap: 8px; font-size: 15px; font-weight: 600; letter-spacing: -0.01em; }
+.gnav .logo svg { width: 18px; height: 18px; }
+.gnav nav { display: flex; gap: 30px; margin-left: auto; }
+.gnav nav a, .gnav .lang button { color: rgba(0, 0, 0, .8); transition: color .2s; }
+.gnav nav a:hover, .gnav .lang button:hover { color: #000; }
+.gnav .lang { display: flex; gap: 2px; align-items: center; color: var(--ink-3); }
+.gnav .lang button { font: inherit; background: none; border: 0; padding: 4px; cursor: pointer; opacity: .5; }
+.gnav .lang button[aria-pressed="true"] { opacity: 1; font-weight: 600; }
+
+/* ---------- 공통: 구획 · 제목 · 링크 · 버튼 */
+.sec { padding: 110px 0 0; text-align: center; overflow: hidden; }
+.sec.gray { background: var(--gray); }
+.sec.dark { background: #000; color: #f5f5f7; }
+.eyebrow { font-size: 21px; font-weight: 600; letter-spacing: .009em; color: var(--ink-2); }
+.dark .eyebrow { color: #86868b; }
+.headline { font-size: clamp(40px, 7vw, 80px); line-height: 1.05; font-weight: 700; letter-spacing: -0.015em; margin-top: 6px; }
+.sub { font-size: clamp(21px, 2.4vw, 28px); line-height: 1.14; font-weight: 400; letter-spacing: .007em; margin-top: 10px; color: var(--ink); }
+.dark .sub { color: #f5f5f7; }
+.ctas { display: flex; justify-content: center; align-items: center; gap: 30px; margin-top: 24px; flex-wrap: wrap; }
+.pill { display: inline-block; background: var(--blue); color: #fff; font-size: 17px; padding: 11px 22px; border-radius: 980px; transition: background .2s, transform .3s var(--ease); }
+.pill:hover { background: #0077ed; }
+.pill:active { transform: scale(.97); }
+.more { color: var(--link); font-size: 17px; }
+.dark .more { color: var(--link-dark); }
+.more:hover { text-decoration: underline; }
+.more::after { content: " ›"; }
+.meta { margin-top: 14px; font-size: 12px; color: var(--ink-3); letter-spacing: -0.01em; }
+
+/* 제품 화면: 둥근 모서리 · 아주 부드러운 그림자 · 스크롤하면 살짝 커진다 */
+.shot { --s: .9; margin: 64px auto 0; width: min(980px, 100%); border-radius: 18px; overflow: hidden; transform: scale(var(--s)) translateY(calc((1 - var(--s)) * 120px)); transform-origin: 50% 0;
+  box-shadow: 0 2px 6px rgba(0,0,0,.08), 0 30px 80px rgba(0,0,0,.22); will-change: transform; }
+.dark .shot { box-shadow: 0 0 0 1px rgba(255,255,255,.08), 0 40px 100px rgba(41,151,255,.18); }
+.shot img { width: 100%; }
+
+/* ---------- 첫 화면 */
+.hero { padding: 120px 0 0; text-align: center; overflow: hidden; }
+.hero .mark { width: 84px; height: 84px; margin: 0 auto 26px; }
+.hero h1 { font-size: clamp(48px, 9vw, 96px); line-height: 1.02; font-weight: 700; letter-spacing: -0.02em; }
+.hero h1 span { background: linear-gradient(90deg, #0071e3, #7d5cff 55%, #ff375f); -webkit-background-clip: text; background-clip: text; color: transparent; }
+.hero p.lead { font-size: clamp(21px, 2.6vw, 28px); line-height: 1.2; color: var(--ink-2); margin: 22px auto 0; max-width: 24em; }
+.icons { display: flex; justify-content: center; gap: clamp(28px, 6vw, 80px); margin: 80px auto 0; padding-bottom: 110px; }
+.icons a { display: grid; justify-items: center; gap: 14px; font-size: 17px; font-weight: 600; }
+.icons img { width: clamp(96px, 14vw, 150px); height: auto; border-radius: 22.5%; box-shadow: 0 20px 50px rgba(0,0,0,.25); transition: transform .5s var(--ease); }
+.icons a:hover img { transform: translateY(-6px) scale(1.03); }
+.icons small { display: block; font-size: 14px; font-weight: 400; color: var(--ink-2); margin-top: -10px; }
+
+/* ---------- 두 칸 타일 */
+.tiles { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; padding: 12px; background: var(--paper); }
+.tile { border-radius: 28px; padding: 56px 32px 0; text-align: center; overflow: hidden; display: flex; flex-direction: column; min-height: 580px; }
+.tile.gray { background: var(--gray); }
+.tile.dark { background: #000; color: #f5f5f7; }
+.tile h3 { font-size: clamp(32px, 3.6vw, 48px); line-height: 1.08; font-weight: 700; letter-spacing: -0.003em; }
+.tile p { font-size: clamp(19px, 1.8vw, 24px); line-height: 1.2; margin-top: 8px; }
+.tile .ctas { margin-top: 18px; gap: 24px; }
+.tile .ctas .pill { font-size: 15px; padding: 8px 18px; }
+.tile .ctas .more { font-size: 15px; }
+.tile .art { margin-top: auto; padding-top: 40px; }
+.tile .art img { border-radius: 14px 14px 0 0; box-shadow: 0 -4px 40px rgba(0,0,0,.18); }
+.tile .mini { display: grid; place-items: center; height: 260px; }
+/* Pulse 미니 플레이어 (앱과 같은 유리 캡슐) */
+.mp { display: inline-flex; align-items: center; gap: 12px; padding: 8px 8px 8px 10px; border-radius: 32px; font-size: 15px; font-weight: 600; color: #f5f5f7; white-space: nowrap; max-width: 100%;
+  background: linear-gradient(180deg, rgba(70,70,80,.75), rgba(36,36,42,.8)); box-shadow: inset 0 1px 0 rgba(255,255,255,.28), inset 0 0 0 1px rgba(255,255,255,.1), 0 24px 60px rgba(41,151,255,.28); }
+.mp img { width: 36px; height: 36px; border-radius: 10px; }
+.mp .modes { display: flex; gap: 2px; padding: 2px; border-radius: 18px; background: rgba(0,0,0,.25); }
+.mp .modes i { width: 38px; height: 30px; border-radius: 15px; display: grid; place-items: center; }
+.mp .modes i.on { background: linear-gradient(180deg, rgba(255,255,255,.35), rgba(255,255,255,.17)); }
+.mp .modes svg { width: 15px; height: 15px; }
+.mp .dot { width: 8px; height: 8px; border-radius: 50%; background: #787880; }
+.mp .kbd { font-size: 12px; font-weight: 500; padding: 3px 8px; border-radius: 8px; background: rgba(255,255,255,.14); }
+.mp .go { padding: 9px 18px; border-radius: 20px; color: #fff; background: linear-gradient(180deg, #5aaeff, #1a87ff 48%, #0a6ff0); box-shadow: inset 0 1px 0 rgba(255,255,255,.45), 0 4px 18px rgba(10,132,255,.5); }
+@media (max-width: 480px) { .mp .modes, .mp .dot { display: none; } }
+
+/* ---------- 원칙 세 가지 */
+.values { display: grid; grid-template-columns: repeat(3, 1fr); gap: 56px; margin: 70px auto 0; padding-bottom: 120px; text-align: left; }
+.values .ic { width: 52px; height: 52px; border-radius: 14px; display: grid; place-items: center; background: var(--gray); margin-bottom: 20px; }
+.values .ic svg { width: 26px; height: 26px; }
+.values h3 { font-size: 24px; line-height: 1.17; font-weight: 700; letter-spacing: .009em; }
+.values p { color: var(--ink-2); margin-top: 10px; }
+
+/* ---------- 제품 비교 */
+.compare { display: grid; grid-template-columns: 1fr 1fr; gap: 0; margin: 64px auto 0; padding-bottom: 120px; }
+.compare > div { padding: 0 40px; display: grid; justify-items: center; align-content: start; gap: 6px; }
+.compare > div + div { border-left: 1px solid var(--line); }
+.compare img { width: 96px; border-radius: 22.5%; box-shadow: 0 10px 30px rgba(0,0,0,.18); margin-bottom: 18px; }
+.compare h3 { font-size: 28px; font-weight: 700; }
+.compare .tag { color: var(--ink-2); font-size: 17px; }
+.compare ul { list-style: none; padding: 0; margin: 26px 0 0; width: 100%; max-width: 300px; }
+.compare li { padding: 16px 0; border-top: 1px solid var(--line); font-size: 15px; color: var(--ink); }
+.compare li small { display: block; color: var(--ink-3); font-size: 12px; margin-bottom: 2px; }
+.compare .ctas { margin-top: 26px; gap: 22px; }
+.compare .ctas .pill { font-size: 15px; padding: 8px 18px; }
+.compare .ctas .more { font-size: 15px; }
+
+/* ---------- 회사 */
+.about { padding: 120px 0; text-align: center; }
+.about h2 { font-size: clamp(32px, 5vw, 56px); line-height: 1.07; font-weight: 700; letter-spacing: -0.005em; max-width: 16em; margin: 10px auto 0; }
+.about p.body { font-size: 21px; line-height: 1.38; color: var(--ink-2); max-width: 30em; margin: 26px auto 0; }
+.about p.body b { color: var(--ink); font-weight: 600; }
+.about .latin { font-size: 14px; color: var(--ink-3); margin-top: 36px; }
+.about .latin i { color: var(--ink); font-style: italic; }
+
+/* ---------- 바닥글 */
+footer { background: var(--gray); color: var(--ink-2); font-size: 12px; line-height: 1.33; letter-spacing: -0.01em; padding: 18px 0 22px; }
+footer .note { padding-bottom: 14px; border-bottom: 1px solid var(--line); color: var(--ink-3); }
+footer .row { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 10px 24px; padding-top: 14px; }
+footer .links { display: flex; gap: 0; flex-wrap: wrap; }
+footer .links a { color: var(--ink-2); padding: 0 10px; border-left: 1px solid var(--line); }
+footer .links a:first-child { padding-left: 0; border-left: 0; }
+footer .links a:hover { text-decoration: underline; }
+
+/* ---------- 스크롤하면 떠오른다 */
+@media (prefers-reduced-motion: no-preference) {
+  .rv { opacity: 0; transform: translateY(30px); transition: opacity 1s var(--ease), transform 1s var(--ease); }
+  .rv.in { opacity: 1; transform: none; }
+  .rv.d1 { transition-delay: .08s; } .rv.d2 { transition-delay: .16s; } .rv.d3 { transition-delay: .24s; }
+}
+@media (prefers-reduced-motion: reduce) { .shot { --s: 1 !important; } }
+
+@media (max-width: 834px) {
+  .tiles { grid-template-columns: 1fr; }
+  .tile { min-height: 0; }
+  .values { grid-template-columns: 1fr; gap: 40px; text-align: center; }
+  .values .ic { margin: 0 auto 18px; }
+  .compare { grid-template-columns: 1fr; gap: 64px; }
+  .compare > div + div { border-left: 0; }
+  .gnav nav { display: none; }
+  .gnav .lang { margin-left: auto; }
+}
+@media (max-width: 480px) {
+  .ctas { gap: 18px; }
+  .shot { border-radius: 12px; }
+  .tile { padding: 44px 20px 0; border-radius: 22px; }
+  .tile .mini img { border-radius: 22px; }
+}
+</style>
+</head>
+<body>
+
+<header class="gnav">
+  <div class="wrap">
+    <a class="logo" href="#top" aria-label="Exstruo">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="15" width="18" height="5" rx="2.5" fill="#1d1d1f"/><rect x="6" y="9" width="12" height="5" rx="2.5" fill="#1d1d1f" opacity=".7"/><rect x="9" y="3" width="6" height="5" rx="2.5" fill="#1d1d1f" opacity=".4"/></svg>
+      Exstruo
+    </a>
+    <nav aria-label="Exstruo">
+      <a href="#lapse">Lapse</a>
+      <a href="#pulse">Pulse</a>
+      <a href="#values" data-en="Principles">원칙</a>
+      <a href="#about" data-en="About">회사</a>
+    </nav>
+    <div class="lang" role="group" aria-label="Language"><button type="button" data-l="ko" aria-pressed="true">KO</button>·<button type="button" data-l="en" aria-pressed="false">EN</button></div>
+  </div>
+</header>
+
+<main id="top">
+  <!-- 첫 화면 -->
+  <section class="hero">
+    <div class="wrap">
+      <svg class="mark rv" viewBox="0 0 24 24" aria-hidden="true">
+        <defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#0071e3"/><stop offset=".55" stop-color="#7d5cff"/><stop offset="1" stop-color="#ff375f"/></linearGradient></defs>
+        <rect x="3" y="15" width="18" height="5" rx="2.5" fill="url(#g)"/><rect x="6" y="9" width="12" height="5" rx="2.5" fill="url(#g)" opacity=".75"/><rect x="9" y="3" width="6" height="5" rx="2.5" fill="url(#g)" opacity=".5"/>
+      </svg>
+      <h1 class="rv d1" data-en-html="Small tools.<br><span>Made with care.</span>">작은 도구를,<br><span>정성껏 쌓아 올립니다.</span></h1>
+      <p class="lead rv d2" data-en="Exstruo makes small, precise apps for Windows — tools you reach for every day, made a little better.">Exstruo는 매일 손이 가는 Windows 앱을 작고 정교하게 만듭니다.</p>
+      <div class="icons rv d3">
+        <a href="#lapse"><img src="assets/lapse-icon.png" alt="">Lapse<small data-en="Game launcher · playtime">게임 런처 · 플레이 시간</small></a>
+        <a href="#pulse"><img src="assets/pulse-icon.png" alt="">Pulse<small data-en="Auto clicker · macro">오토마우스 · 매크로</small></a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Lapse -->
+  <section class="sec gray" id="lapse">
+    <div class="wrap">
+      <p class="eyebrow rv">Lapse</p>
+      <h2 class="headline rv d1" data-en-html="Every hour you play,<br>beautifully kept.">흘러간 시간까지,<br>아름답게.</h2>
+      <p class="sub rv d2" data-en="Launch every game from one place. Keep only the time you really played.">모든 게임을 한곳에서 켜고, 정말 플레이한 시간만 남깁니다.</p>
+      <div class="ctas rv d3">
+        <a class="pill js-lapse-dl" href="#" data-en="Download">다운로드</a>
+        <a class="more js-lapse-site" href="#" data-en="Learn more">더 알아보기</a>
+      </div>
+      <p class="meta rv d3" data-en="Version 3.2 · Windows 10 and 11 · Free">버전 3.2 · Windows 10, 11 · 무료</p>
+      <div class="shot js-grow"><img src="assets/lapse-library.png" alt="Lapse 라이브러리 화면" loading="lazy"></div>
+    </div>
+  </section>
+
+  <!-- Pulse -->
+  <section class="sec dark" id="pulse">
+    <div class="wrap">
+      <p class="eyebrow rv">Pulse</p>
+      <h2 class="headline rv d1" data-en-html="The same click, over and over.<br>Let Pulse do it.">똑같은 클릭은,<br>이제 Pulse가.</h2>
+      <p class="sub rv d2" data-en="Clicks and keys at a steady pace. Record once, replay as often as you like.">정해진 간격으로 대신 누르고, 한 번 녹화한 동작을 몇 번이고 반복합니다.</p>
+      <div class="ctas rv d3">
+        <a class="pill js-pulse-dl" href="#" data-en="Download">다운로드</a>
+        <a class="more js-pulse-site" href="#" data-en="Try it in your browser">브라우저에서 써 보기</a>
+      </div>
+      <p class="meta rv d3" data-en="Version 1.0.0 · Windows 10 and 11 · Free">버전 1.0.0 · Windows 10, 11 · 무료</p>
+      <div class="shot js-grow"><img src="assets/pulse-clicker.png" alt="Pulse 자동 클릭 화면" loading="lazy"></div>
+    </div>
+  </section>
+
+  <!-- 두 칸 타일 -->
+  <section class="tiles">
+    <div class="tile gray rv">
+      <h3 data-en="Lapse stats">Lapse 통계</h3>
+      <p data-en="When, what, and for how long.">언제, 무엇을, 얼마나.</p>
+      <div class="ctas"><a class="more js-lapse-site" href="#" data-en="Learn more">더 알아보기</a></div>
+      <div class="art"><img src="assets/lapse-stats.png" alt="Lapse 통계 화면" loading="lazy"></div>
+    </div>
+    <div class="tile dark rv d1">
+      <h3 data-en="Pulse mini player">Pulse 미니 플레이어</h3>
+      <p data-en="Floats above everything. Start and stop in one click.">화면 위에 떠서, 한 번에 시작하고 멈춥니다.</p>
+      <div class="ctas"><a class="more js-pulse-site" href="#" data-en="Learn more">더 알아보기</a></div>
+      <div class="art mini" role="img" aria-label="Pulse 미니 플레이어">
+        <div class="mp">
+          <img src="assets/pulse-icon.png" alt="">
+          <span class="modes"><i class="on"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2"><rect x="6" y="3" width="12" height="18" rx="6"/><path d="M12 7v4"/></svg></i><i><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><rect x="2.5" y="6" width="19" height="12" rx="2.5"/><path d="M7 14h10"/></svg></i><i><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="6" fill="#fff"/></svg></i></span>
+          <span class="dot"></span><span class="txt" data-en="Left click · every 0.1 s">왼쪽 클릭 · 0.1초마다</span><span class="kbd">F6</span><span class="go" data-en="Start">시작</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 원칙 -->
+  <section class="sec" id="values" style="padding-top:120px">
+    <div class="wrap">
+      <p class="eyebrow rv" data-en="Principles">만드는 원칙</p>
+      <h2 class="headline rv d1" style="font-size:clamp(36px,5.6vw,64px)" data-en="Less, but better.">더 적게, 더 낫게.</h2>
+      <div class="values">
+        <div class="rv">
+          <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="#0071e3" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12.5 9.5 18 20 6"/></svg></div>
+          <h3 data-en="No manual needed.">설명서가 필요 없게.</h3>
+          <p data-en="If a screen needs explaining, we redraw the screen. Every word in our apps is written for people, not engineers.">설명이 필요한 화면이면 화면을 다시 그립니다. 앱 안의 모든 문장은 개발자가 아니라 쓰는 사람을 위해 씁니다.</p>
+        </div>
+        <div class="rv d1">
+          <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="#0071e3" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="10" width="16" height="10" rx="2.5"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg></div>
+          <h3 data-en="It stays on your PC.">내 PC 안에서만.</h3>
+          <p data-en="No accounts, no sign-up. Your records, settings and macros are files on your own computer.">계정도 가입도 없습니다. 기록과 설정, 매크로는 모두 내 컴퓨터 안의 파일로 남습니다.</p>
+        </div>
+        <div class="rv d2">
+          <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="#0071e3" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v18M17 7.5c0-1.9-2.2-3-5-3s-5 1.1-5 3 2 2.6 5 3.5 5 1.6 5 3.5-2.2 3-5 3-5-1.1-5-3"/><path d="M4 4l16 16"/></svg></div>
+          <h3 data-en="Free. No ads.">무료. 광고 없이.</h3>
+          <p data-en="No subscriptions, no banners, no trial that runs out. Download it and it's yours.">구독도, 배너도, 끝나는 체험판도 없습니다. 받으면 그대로 내 것입니다.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 제품 한눈에 -->
+  <section class="sec gray" id="products">
+    <div class="wrap">
+      <h2 class="headline rv" style="font-size:clamp(36px,5.6vw,64px)" data-en="Which one is for you?">어떤 앱이 필요하세요?</h2>
+      <div class="compare">
+        <div class="rv">
+          <img src="assets/lapse-icon.png" alt="">
+          <h3>Lapse</h3>
+          <p class="tag" data-en="For people who play games">게임을 하는 사람을 위해</p>
+          <ul>
+            <li><small data-en="Library">라이브러리</small><span data-en="Steam, Epic, EA, Riot, Ubisoft, HoYoPlay, Nexon, Battle.net in one place">스팀, Epic, EA, 라이엇, 유비소프트, 호요플레이, 넥슨, Battle.net을 한곳에</span></li>
+            <li><small data-en="Recording">기록</small><span data-en="Only the window in front; pauses when you step away">맨 앞 창만, 자리를 비우면 멈춤</span></li>
+            <li><small data-en="Stats">통계</small><span data-en="Calendar, per-game share, year-end recap">달력, 게임별 비중, 연말 결산</span></li>
+            <li><small data-en="Extras">더</small><span data-en="Collections, ratings, notes, Discord status">모음집, 별점, 메모, 디스코드 상태</span></li>
+          </ul>
+          <div class="ctas"><a class="pill js-lapse-dl" href="#" data-en="Download">다운로드</a><a class="more js-lapse-site" href="#" data-en="Learn more">더 알아보기</a></div>
+        </div>
+        <div class="rv d1">
+          <img src="assets/pulse-icon.png" alt="">
+          <h3>Pulse</h3>
+          <p class="tag" data-en="For anything you do over and over">반복하는 모든 일을 위해</p>
+          <ul>
+            <li><small data-en="Auto clicker">자동 클릭</small><span data-en="Every 0.001 s to once an hour, at the mouse or a fixed spot">0.001초부터 1시간 간격, 마우스 자리나 정해둔 곳</span></li>
+            <li><small data-en="Auto keyboard">자동 키보드</small><span data-en="Any key with Ctrl, Alt, Shift — or whole lines of text">Ctrl · Alt · Shift 조합 키, 글자 통째로 입력</span></li>
+            <li><small data-en="Macro">매크로</small><span data-en="Record, read it in plain words, save and replay">녹화하고, 쉬운 말로 확인하고, 저장해 반복</span></li>
+            <li><small data-en="Safety">안전</small><span data-en="F8 stops everything, from any window">F8 하나로 어디서든 모두 멈춤</span></li>
+          </ul>
+          <div class="ctas"><a class="pill js-pulse-dl" href="#" data-en="Download">다운로드</a><a class="more js-pulse-site" href="#" data-en="Learn more">더 알아보기</a></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 회사 -->
+  <section class="about" id="about">
+    <div class="wrap">
+      <p class="eyebrow rv" data-en="About Exstruo">Exstruo</p>
+      <h2 class="rv d1" data-en="We build things up, one careful layer at a time.">하나씩, 정성껏 쌓아 올립니다.</h2>
+      <p class="body rv d2" data-en-html="Exstruo is a small studio making software for Windows. We start with something people already do every day — <b>playing a game, clicking the same button</b> — and keep refining it until it simply gets out of the way.">Exstruo는 Windows용 소프트웨어를 만드는 작은 스튜디오입니다. 사람들이 이미 매일 하는 일 — <b>게임을 하고, 같은 버튼을 누르는 일</b> — 에서 시작해, 거슬리는 것이 하나도 남지 않을 때까지 다듬습니다.</p>
+      <p class="latin rv d3"><i>exstruō</i> — <span data-en="Latin: to build up, to pile up, to raise.">라틴어로 ‘쌓아 올리다, 세우다’.</span></p>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <p class="note" data-en="Lapse and Pulse are free apps for Windows 10 and 11. Many online games forbid auto clickers and macros in their terms; check a game's rules before using Pulse with it.">Lapse와 Pulse는 Windows 10, 11용 무료 앱입니다. 많은 온라인 게임이 약관에서 오토마우스 · 매크로를 금지하니, Pulse를 게임에 쓰기 전에 그 게임의 규칙을 확인하세요.</p>
+    <div class="row">
+      <span>Copyright © 2026 Exstruo. All rights reserved.</span>
+      <div class="links">
+        <a href="#lapse">Lapse</a>
+        <a href="#pulse">Pulse</a>
+        <a class="js-github" href="https://github.com/ExstruoHQ">GitHub</a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<script>
+  // ---- 제품 주소: 사이트를 옮기거나 새 버전을 올리면 여기만 바꾸면 된다. 비어 있는 링크는 숨긴다.
+  const LINKS = {
+    lapseDownload: "https://github.com/ExstruoHQ/lapse/releases/latest/download/LapseSetup.exe",
+    lapseSite: "https://exstruohq.github.io/lapse/",
+    pulseDownload: "https://exstruohq.github.io/pulse/downloads/PulseSetup-1.0.0.exe",
+    pulseSite: "https://exstruohq.github.io/pulse/",
+  };
+  const wire = (cls, url) => document.querySelectorAll(cls).forEach((a) => { if (url) a.href = url; else a.hidden = true; });
+  wire(".js-lapse-dl", LINKS.lapseDownload);
+  wire(".js-lapse-site", LINKS.lapseSite);
+  wire(".js-pulse-dl", LINKS.pulseDownload);
+  wire(".js-pulse-site", LINKS.pulseSite);
+
+  // ---- 한국어 / 영어 (기기 언어를 따르고, 고르면 기억한다 · ?lang=en)
+  const i18n = [...document.querySelectorAll("[data-en], [data-en-html]")];
+  i18n.forEach((el) => (el.dataset.ko = el.innerHTML));
+  const esc = (s) => s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+  function setLang(lang) {
+    document.documentElement.lang = lang;
+    i18n.forEach((el) => { el.innerHTML = lang === "en" ? (el.dataset.enHtml ?? esc(el.dataset.en)) : el.dataset.ko; });
+    document.querySelectorAll(".lang button").forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.l === lang)));
+    try { localStorage.setItem("exstruo-lang", lang); } catch (e) { /* 이번에만 */ }
+  }
+  let startLang = (navigator.language || "ko").toLowerCase().startsWith("ko") ? "ko" : "en";
+  try { startLang = localStorage.getItem("exstruo-lang") || startLang; } catch (e) { /* 기기 언어로 */ }
+  const q = new URLSearchParams(location.search).get("lang");
+  if (q === "en" || q === "ko") startLang = q;
+  document.querySelectorAll(".lang button").forEach((b) => b.addEventListener("click", () => setLang(b.dataset.l)));
+  setLang(startLang);
+
+  // ---- 스크롤: 떠오르기 · 제품 화면이 화면 가운데로 올수록 커진다
+  const io = new IntersectionObserver((es) => es.forEach((e) => { if (e.isIntersecting) { e.target.classList.add("in"); io.unobserve(e.target); } }), { threshold: 0.15, rootMargin: "0px 0px -40px 0px" });
+  document.querySelectorAll(".rv").forEach((el) => io.observe(el));
+  const grows = [...document.querySelectorAll(".js-grow")];
+  const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+  let ticking = false;
+  function onScroll() {
+    ticking = false;
+    if (reduce) return;
+    const vh = innerHeight;
+    grows.forEach((el) => {
+      const r = el.getBoundingClientRect();
+      const p = Math.max(0, Math.min(1, (vh - r.top) / (vh * 0.7)));
+      el.style.setProperty("--s", (0.9 + 0.1 * p).toFixed(3));
+    });
+  }
+  addEventListener("scroll", () => { if (!ticking) { ticking = true; requestAnimationFrame(onScroll); } }, { passive: true });
+  addEventListener("resize", onScroll);
+  onScroll();
+</script>
+</body>
+</html>
